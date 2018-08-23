@@ -91,7 +91,8 @@ $(document).ready(function(){
             data: JSON.stringify(data) ,
             dataType: 'json',
             success: function (result) {
-                console.log('LoggedIn');
+                console.log('LoggedIn', result);
+                $('#inputUserId').val(result.user.id);
                 $("#loginButton").prop("disabled", true);
                 $("#registerButton").prop("disabled", true);
                 $("#changePasswordButton").prop("disabled", false);
@@ -186,15 +187,116 @@ $(document).ready(function(){
 	      select: function(startDate, endDate) { // neesošs events
 			  $('#calendarModal').modal('show');
 			  $("#calendarDeleteButton").prop("disabled", true);
-	          //alert('selected ' + startDate.format() + ' to ' + endDate.format());
+			  $('#calendarModalLabel').text('Pievienot jauno: Izvēlēties laiku');
+			  $('#inputEventId').val(0);
+			  $('#inputActivity').val('');
+			  $('#datetimepickerStart').data("DateTimePicker").date(startDate);
+			  $('#datetimepickerEnd').data("DateTimePicker").date(endDate);
+			  $('#inputActivity').focus();
 	      },
 	      eventClick: function (calEvent, jsEvent, view) { // esošs events
 			  $('#calendarModal').modal('show');
 			  $("#calendarDeleteButton").prop("disabled", false);
-              //alert('You clicked on event id: ' + calEvent.id + "\nSpecial ID: " + calEvent.someKey + "\nAnd the title is: " + calEvent.title);
-
+			  $('#calendarModalLabel').text('Mainīt esošo: Izvēlēties laiku');
+			  $('#inputEventId').val(calEvent.id);
+			  $('#inputActivity').val(calEvent.title);
+			  $('#datetimepickerStart').data("DateTimePicker").date(calEvent.start);
+			  $('#datetimepickerEnd').data("DateTimePicker").date(calEvent.end);
+			  $('#inputActivity').focus();
           }
 
 	});
+    
+    // DeleteCalendarButton
+    $('#calendarDeleteButton').click(function () {
+    	console.log('Deleting event...', $('#inputEventId').val());
+    	var data = {};
+    	data['id'] = $('#inputEventId').val();
+        $.ajax({
+            type: 'POST',
+            url: '/TimeTracker/event/delete',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data) ,
+            dataType: 'json',
+            success: function (result) {
+                console.log('Deleted event', $('#inputEventId').val());
+                $('#calendar').fullCalendar('removeEvents', data.id);
+                $('#calendarModal').modal('hide');
+            },
+            error: function (x, e) {
+                console.log('Deleting event error', x, e);
+                $('#calendarModal').modal('hide');
+                if (x.status === 400 && x.responseJSON.msg === "empty") {
+                    alertError("Vajag izvēlēties aktivitāti.");
+                    //TODO: pielikt validation
+                } else if (x.status === 400 && x.responseJSON.msg === "cross") {
+                    alertError("Aktivitātes nedrīkst pārklāties.");
+                    //TODO: pielikt validation
+                } else {
+                	alertError("Kļūda: " + x.status);
+                }
+            }
+        })
+    })
+    
+    // UpdateCalendarButton / Create
+    $('#calendarSubmitButton').click(function () {
+    	var data = {};
+    	data['id'] = parseInt($('#inputEventId').val());
+    	console.log(data.id === 0 ? 'Creating event...' : 'Updating event...', data.id);
+    	data['userId'] = parseInt($('#inputUserId').val());
+    	data['title'] = $('#inputActivity').val(); 
+    	data['start'] = $('#datetimepickerStart').data("DateTimePicker").date().toISOString().substring(0, 19);
+    	if (data['start'] && data['start'].length === 10) {
+    		data['start'] += 'T00:00:00';
+    	}
+    	data['end'] = $('#datetimepickerEnd').data("DateTimePicker").date().toISOString().substring(0, 19);
+    	if (data['end'].length === 10) {
+    		data['end'] += 'T00:00:00';
+    	}
+    	console.log('Data before post', data);
+        $.ajax({
+            type: 'POST',
+            url: '/TimeTracker/event/' + (data.id === 0 ? 'create' : 'update'),
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data) ,
+            dataType: 'json',
+            success: function (result) {
+                console.log(data.id === 0 ? 'Created event' : 'Updated event', data.id === 0 ? result.event.id : data.id);
+                if (data.id) {
+                    var events = $('#calendar').fullCalendar('clientEvents');
+                    var event = _.find(events, function (e) {
+                    	return e.id === data.id;
+                    });
+                    event.userId = data.userId;
+                    event.title = data.title;
+                    event.start = data.start;
+                    event.end = data.end;
+                    $('#calendar').fullCalendar('updateEvent', event);
+                } else {
+                	var event = {};
+                    event.id = result.event.id;
+                    event.title = data.title;
+                    event.start = data.start;
+                    event.end = data.end;
+                    $('#calendar').fullCalendar('renderEvent', event);
+                }
+                $('#calendarModal').modal('hide');
+            },
+            error: function (x, e) {
+                console.log(data.id === 0 ? 'Creating' : 'Updating' + ' event error', x, e);
+                $('#calendarModal').modal('hide');
+                if (x.status === 400 && x.responseJSON.msg === "empty") {
+                    alertError("Vajag izvēlēties aktivitāti.");
+                    //TODO: pielikt validation
+                } else if (x.status === 400 && x.responseJSON.msg === "cross") {
+                    alertError("Aktivitātes nedrīkst pārklāties.");
+                    //TODO: pielikt validation
+                } else {
+                	alertError("Kļūda: " + x.status);
+                }
+            }
+        })
+    })
 
 });

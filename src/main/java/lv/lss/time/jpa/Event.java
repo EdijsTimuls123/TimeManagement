@@ -3,6 +3,7 @@ package lv.lss.time.jpa;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -23,11 +24,11 @@ public class Event implements Serializable{
 	private static final long serialVersionUID = -3980632729194212637L;
 	
 	@Id
-	@GeneratedValue (strategy = GenerationType.AUTO, generator = "native")
-	@GenericGenerator(name = "native", strategy = "native")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false, nullable = false)
 	private Integer id;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne
     @JoinColumn(name = "userId")
     private User user;
 	
@@ -70,6 +71,14 @@ public class Event implements Serializable{
 
 	public void setInfo(String info) {
 		this.info = info;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	@Override

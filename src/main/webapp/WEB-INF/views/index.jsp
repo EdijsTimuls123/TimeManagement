@@ -36,6 +36,8 @@
 <body>
 	<h2>Laika uzskaites sistēma</h2>
 
+	<input type="hidden" id="inputUserId" name="inputUserId" value="0">
+
 	<div id="alertSuccess" class="alert alert-success" data-alert="alert">Success</div>
 	<div id="alertError" class="alert alert-danger" data-alert="alert">Error</div>
 
@@ -77,6 +79,7 @@
 				<div class="modal-body">
 
 					<form class="form-horizontal" role="form">
+						<input type="hidden" id="inputEventId" name="inputEventId" value="0">
 						<div class="form-group">
 							<label class="col-sm-2 control-label" for="inputActivity">Aktivitāte</label>
 							<div class="col-sm-10">

@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDTO {
+	private Integer id;
 	private String username;
 	private String password;
 	private List<EventDTO> events = new ArrayList<>();
 
-	public List<EventDTO> getEvents() {
-		return events;
+	public Integer getId() {
+		return id;
 	}
-	public void setEvents(List<EventDTO> events) {
-		this.events = events;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	public String getUsername() {
 		return username;
@@ -25,5 +26,11 @@ public class UserDTO {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public List<EventDTO> getEvents() {
+		return events;
+	}
+	public void setEvents(List<EventDTO> events) {
+		this.events = events;
 	}
 }

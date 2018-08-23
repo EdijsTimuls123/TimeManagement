@@ -26,13 +26,12 @@ import lv.lss.time.dto.UserDTO;
 import lv.lss.time.dto.UserResponseDTO;
 import lv.lss.time.jpa.Event;
 import lv.lss.time.jpa.User;
-import lv.progmeistars.lessons.HomeController;
 
 @Controller
 @RequestMapping(value="/register")
 public class RegistrationController {
 
-	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	private static final Logger logger = LoggerFactory.getLogger(RegistrationController.class);
 	
 	private TimeCoreServiceInterface coreService;
 	
@@ -46,6 +45,7 @@ public class RegistrationController {
 		// User          -> UserDTO
 		//   List(Event) ->   List(EventDTO)
 		UserDTO userDto = new UserDTO();
+		userDto.setId(user.getId());
 		userDto.setUsername(user.getName());
 		userDto.setPassword("********");
 		List<EventDTO> eventsDto = new ArrayList<EventDTO>();
@@ -53,6 +53,7 @@ public class RegistrationController {
 			// katrs item (Event source) no List<Event> -> EventDTO
 			EventDTO eventDto = new EventDTO();
 			eventDto.setId(source.getId());
+			eventDto.setUserId(user.getId());
 			eventDto.setStart(source.getStartDate().format(formatter));
 			eventDto.setEnd(source.getEndDate().format(formatter));
 			eventDto.setTitle(source.getInfo());
@@ -96,6 +97,8 @@ public class RegistrationController {
 			produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody ResponseEntity<UserResponseDTO> verifyLogin(@RequestBody UserDTO userForm) {
 		
+		logger.info("##### login");
+		
 		UserResponseDTO result = new UserResponseDTO(userForm);
 		
 		if (userForm == null || userForm.getUsername() == null || userForm.getPassword() == null ||
@@ -106,6 +109,7 @@ public class RegistrationController {
 				
 		User user = coreService.loginUser(userForm.getUsername(), userForm.getPassword());
 		if (user != null) {
+			logger.info(user.getId().toString());
 			result.user = convertToDto(user);
 		}
 		
@@ -114,7 +118,7 @@ public class RegistrationController {
 		
 	
 
-	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	@RequestMapping(value = "/logout", method = RequestMethod.POST)
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
 		Authentication auth = SecurityContextHolder.getContext()
 				.getAuthentication();

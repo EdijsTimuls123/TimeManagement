@@ -36,6 +36,11 @@
 		<beans:property name="coreService"
 			ref="timeCoreService" />
 	</beans:bean>
+	<beans:bean id="eventController"
+		class="lv.lss.time.ui.EventController">
+		<beans:property name="coreService"
+			ref="timeCoreService" />
+	</beans:bean>
 	<context:component-scan
 		base-package="lv.lss.time.ui" />
 

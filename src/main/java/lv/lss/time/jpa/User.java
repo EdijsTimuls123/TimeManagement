@@ -14,8 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.GenericGenerator;
-
 @Entity
 @Table(name="user")
 public class User implements Serializable{
@@ -23,19 +21,13 @@ public class User implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -3980632729194212637L;
-	@Id 
-	@GeneratedValue(
-		    strategy= GenerationType.AUTO, 
-		    generator="native"
-		)
-		@GenericGenerator(
-		    name = "native", 
-		    strategy = "native"
-		)
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false, nullable = false)
 	private Integer id;
 	
 	@Column(name="name")
-
 	private String name;
 	
 	@Column(name="password_")
@@ -49,6 +41,12 @@ public class User implements Serializable{
     )
 	private List<Event> events = new ArrayList<>();
 	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
 	public String getName() {
 		return name;
 	}
@@ -66,12 +64,6 @@ public class User implements Serializable{
 	}
 	public void setEvents(List<Event> events) {
 		this.events = events;
-	}
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
 	}
 	
 }
