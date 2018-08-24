@@ -11,13 +11,13 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lv.lss.time.dto.EventDTO;
 import lv.lss.time.jpa.Event;
 import lv.lss.time.jpa.User;
 
 @Stateless
 public class TimeCoreService implements TimeCoreServiceInterface {
 
+	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(TimeCoreService.class);
 	
 	@PersistenceContext(name="timePU")
@@ -86,7 +86,6 @@ public class TimeCoreService implements TimeCoreServiceInterface {
 			.orElse(null);
 	}
 
-	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@Transactional
 	public void deleteEventById(Integer id){
@@ -143,4 +142,13 @@ public class TimeCoreService implements TimeCoreServiceInterface {
 		return eventQuery.getResultList().size() == 0;
 	}
 
+	@Transactional
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void savePassword(User u) {
+		String updateQuery = "UPDATE User SET password=:password WHERE id=:id";
+		Query eventQuery = entityManager.createQuery(updateQuery);
+		eventQuery.setParameter("id", u.getId());
+		eventQuery.setParameter("password", u.getPassword());
+		eventQuery.executeUpdate();
+	}
 }

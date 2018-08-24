@@ -84,7 +84,7 @@
 							<label class="col-sm-2 control-label" for="inputActivity">Aktivitāte</label>
 							<div class="col-sm-10">
 								<input type="text" class="form-control" id="inputActivity"
-									placeholder="Aktivitāte" />
+									placeholder="Aktivitāte" autofocus/>
 							</div>
 						</div>
 						<div class="form-group">
@@ -146,7 +146,7 @@
 							<label class="col-sm-2 control-label" for="inputUsername">Lietotājs</label>
 							<div class="col-sm-10">
 								<input type="email" class="form-control" id="inputUsername"
-									placeholder="Lietotājs" />
+									placeholder="Lietotājs" autofocus/>
 							</div>
 						</div>
 						<div class="form-group">
@@ -191,7 +191,7 @@
 							<label class="col-sm-2 control-label" for="inputNewUsername">Lietotājs</label>
 							<div class="col-sm-10">
 								<input type="email" class="form-control" id="inputNewUsername"
-									placeholder="Lietotājs" />
+									placeholder="Lietotājs" autofocus/>
 							</div>
 						</div>
 						<div class="form-group">
@@ -234,6 +234,14 @@
 				<div class="modal-body">
 
 					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label class="col-sm-2 control-label" for="inputPassword0">Esošā
+								parole</label>
+							<div class="col-sm-10">
+								<input type="password" class="form-control" id="inputPassword0"
+									placeholder="Esošā parole" autocomplete="off" autofocus/>
+							</div>
+						</div>
 						<div class="form-group">
 							<label class="col-sm-2 control-label" for="inputPassword1">Jaunā
 								parole</label>

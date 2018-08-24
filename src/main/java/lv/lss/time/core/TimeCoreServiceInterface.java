@@ -15,4 +15,5 @@ public interface TimeCoreServiceInterface {
 	public void saveEvent(Event e);
 	public Integer createEvent(Event e);
 	public boolean validateEvent(Event e);
+	public void savePassword(User u);
 }

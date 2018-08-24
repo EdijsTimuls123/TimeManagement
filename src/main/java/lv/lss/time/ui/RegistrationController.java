@@ -11,9 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,6 +61,14 @@ public class RegistrationController {
 		userDto.setEvents(eventsDto);
 	    return userDto;
 	}
+	
+	private User convertToEntity(UserDTO userDto) {
+    	User u  = new User();
+		u.setId(userDto.getId());
+		u.setName(userDto.getUsername());
+		u.setPassword(userDto.getPassword());
+		return u;
+    }
 	
 	@RequestMapping(value="/new", method = RequestMethod.POST, 
 			produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -116,22 +121,47 @@ public class RegistrationController {
 		return ResponseEntity.ok().body(result);
 	}
 		
-	
+	@RequestMapping(value="/updatePassword", method = RequestMethod.POST, 
+			produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody ResponseEntity<UserResponseDTO> updatePassword(@RequestBody UserDTO userForm) {
 
-	@RequestMapping(value = "/logout", method = RequestMethod.POST)
-	public String logout(HttpServletRequest request, HttpServletResponse response) {
-		Authentication auth = SecurityContextHolder.getContext()
+		UserResponseDTO result = new UserResponseDTO(userForm);
+		
+		// Check mandatory parameters
+		if (userForm.getId() == null || userForm.getId() == 0 ||
+				userForm.getPassword() == null || userForm.getPassword().isEmpty() ||
+				userForm.getNewPassword() == null || userForm.getNewPassword().isEmpty()) {
+			result.msg = "empty";
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		// Check existing password
+		User user = coreService.getUserById(userForm.getId());		
+		if (!user.getPassword().equals(userForm.getPassword())) {
+			result.msg = "wrong";
+			return ResponseEntity.badRequest().body(result);
+		}
+
+		// Update password
+		userForm.setPassword(userForm.getNewPassword());
+		coreService.savePassword(convertToEntity(userForm));
+
+		return ResponseEntity.ok().body(result);
+	}
+
+	@RequestMapping(value = "/logout", method = RequestMethod.POST, 
+			produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+		/*Authentication auth = SecurityContextHolder.getContext()
 				.getAuthentication();
 		if (auth != null) {
 			new SecurityContextLogoutHandler().logout(request, response, auth);
 		}
 		
-		request.getSession().invalidate();
+		request.getSession().invalidate();*/
 		
-		return "redirect:/";
+		return ResponseEntity.ok().body("{}");
 	}
-	
-	
 	
 }
 

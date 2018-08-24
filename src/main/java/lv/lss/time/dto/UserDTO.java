@@ -7,6 +7,7 @@ public class UserDTO {
 	private Integer id;
 	private String username;
 	private String password;
+	private String newPassword;
 	private List<EventDTO> events = new ArrayList<>();
 
 	public Integer getId() {
@@ -23,6 +24,12 @@ public class UserDTO {
 	}
 	public String getPassword() {
 		return password;
+	}
+	public String getNewPassword() {
+		return newPassword;
+	}
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
 	}
 	public void setPassword(String password) {
 		this.password = password;

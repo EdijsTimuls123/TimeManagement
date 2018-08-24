@@ -10,7 +10,31 @@ $(document).ready(function(){
     $("#alertError").hide();   
     
     // LogoutButton
-    
+    $('#logoutButton').click(function () {
+    	console.log('Logging out...');
+    	var data = {};
+        $.ajax({
+            type: 'POST',
+            url: '/TimeTracker/register/logout',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data) ,
+            dataType: 'json',
+            success: function (result) {
+                console.log('Logged out');
+                $('#inputUserId').val(0);
+                $("#loginButton").prop("disabled", false);
+                $("#registerButton").prop("disabled", false);
+                $("#changePasswordButton").prop("disabled", true);
+                $("#logoutButton").prop("disabled", true);
+                $('#calendar').fullCalendar('removeEvents');
+                $("#calendar").hide();
+            },
+            error: function (x, e) {
+                console.log('Logout: error', x, e);
+            	alertError("Kļūda: " + x.status);
+            }
+        })
+    })
     
     // Change password
     $("input[type=password]").keyup(function(){
@@ -153,6 +177,39 @@ $(document).ready(function(){
         })
     })
     
+    // ChangePasswordButton
+     $('#changePasswordSubmitButton').click(function () {
+    	console.log('Updating password...');
+    	var data = {};
+    	data['id'] = $('#inputUserId').val();
+    	data['password'] = $('#inputPassword0').val();
+    	data['newPassword'] = $('#inputPassword1').val();
+        $.ajax({
+            type: 'POST',
+            url: '/TimeTracker/register/updatePassword',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data) ,
+            dataType: 'json',
+            success: function (result) {
+                console.log('Updated password');
+                $('#changePasswordModal').modal('hide');
+                $("#changePasswordButton").prop("disabled", false);
+                alertSuccess("Parole ir nomainīta");
+            },
+            error: function (x, e) {
+                console.log('updatePassword: error', x, e);
+                $('#changePasswordModal').modal('hide');
+                if (x.status === 400 && x.responseJSON.msg === "empty") {
+                    alertError("Parole jābūt aizpildīta");
+                } else if (x.status === 400 && x.responseJSON.msg === "wrong") {
+                    alertError("Esošā parole neder.");
+                } else {
+                	alertError("Kļūda: " + x.status);
+                }
+            }
+        })
+    })
+    
     function alertSuccess(msg) {
     	$("#alertSuccess").text(msg);
     	$("#alertSuccess").fadeTo(2000, 500).slideUp(500, function(){
@@ -192,7 +249,6 @@ $(document).ready(function(){
 			  $('#inputActivity').val('');
 			  $('#datetimepickerStart').data("DateTimePicker").date(startDate);
 			  $('#datetimepickerEnd').data("DateTimePicker").date(endDate);
-			  $('#inputActivity').focus();
 	      },
 	      eventClick: function (calEvent, jsEvent, view) { // esošs events
 			  $('#calendarModal').modal('show');
@@ -202,7 +258,6 @@ $(document).ready(function(){
 			  $('#inputActivity').val(calEvent.title);
 			  $('#datetimepickerStart').data("DateTimePicker").date(calEvent.start);
 			  $('#datetimepickerEnd').data("DateTimePicker").date(calEvent.end);
-			  $('#inputActivity').focus();
           }
 
 	});

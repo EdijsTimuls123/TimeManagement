@@ -23,6 +23,7 @@ import lv.lss.time.jpa.User;
 @RequestMapping(value="/event")
 public class EventController {
 
+	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(EventController.class);
 	
 	private TimeCoreServiceInterface coreService;
