@@ -4,11 +4,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -97,10 +97,38 @@ public class RegistrationController {
 		return ResponseEntity.ok().body(result);
 	}
 	
-	
+	@RequestMapping(value="/session", method = RequestMethod.GET, 
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody ResponseEntity<UserResponseDTO> setupSession(HttpSession session) {
+		
+		logger.info("##### setup session");
+		
+		UserResponseDTO result = new UserResponseDTO(null);
+
+		// Check existing session, retrieve user id
+		Integer userId = (Integer) session.getAttribute("id");
+		if (userId == null) {
+			// Respond OK with empty user object
+			return ResponseEntity.ok().body(result);
+		}
+		
+		User user = coreService.getUserById(userId);
+
+		// Check if user is found
+		if (user == null) {
+			result.msg = "notfound";
+			return ResponseEntity.badRequest().body(result);
+		}
+
+		logger.info(user.getId().toString());
+		result.user = convertToDto(user);
+		
+		return ResponseEntity.ok().body(result);
+	}
+
 	@RequestMapping(value="/login", method = RequestMethod.POST, 
 			produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody ResponseEntity<UserResponseDTO> verifyLogin(@RequestBody UserDTO userForm) {
+	@ResponseBody ResponseEntity<UserResponseDTO> verifyLogin(@RequestBody UserDTO userForm, HttpSession session) {
 		
 		logger.info("##### login");
 		
@@ -124,9 +152,15 @@ public class RegistrationController {
 		logger.info(user.getId().toString());
 		result.user = convertToDto(user);
 		
+		// Setup session
+		session.setAttribute("id", user.getId());
+		session.setAttribute("username", user.getName());
+		session.setAttribute("password", user.getPassword());
+		
 		return ResponseEntity.ok().body(result);
 	}
 		
+	@Scope("session")
 	@RequestMapping(value="/updatePassword", method = RequestMethod.POST, 
 			produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody ResponseEntity<UserResponseDTO> updatePassword(@RequestBody UserDTO userForm) {
@@ -157,14 +191,10 @@ public class RegistrationController {
 
 	@RequestMapping(value = "/logout", method = RequestMethod.POST, 
 			produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
-		/*Authentication auth = SecurityContextHolder.getContext()
-				.getAuthentication();
-		if (auth != null) {
-			new SecurityContextLogoutHandler().logout(request, response, auth);
-		}
-		
-		request.getSession().invalidate();*/
+	@ResponseBody ResponseEntity<String> logout(HttpSession session) {
+
+		// Invalidate session
+		session.invalidate();
 		
 		return ResponseEntity.ok().body("{}");
 	}

@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -45,7 +46,8 @@ public class EventController {
 		return e;
     }
 
-	@RequestMapping(value="/delete", method = RequestMethod.POST, 
+    @Scope("session")
+    @RequestMapping(value="/delete", method = RequestMethod.POST, 
 			produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody ResponseEntity<EventResponseDTO> deleteEvent(@RequestBody EventDTO eventForm) {
 
@@ -63,7 +65,8 @@ public class EventController {
 		return ResponseEntity.ok().body(result);
 	}
 	
-	@RequestMapping(value="/update", method = RequestMethod.POST, 
+    @Scope("session")
+    @RequestMapping(value="/update", method = RequestMethod.POST, 
 			produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody ResponseEntity<EventResponseDTO> updateEvent(@RequestBody EventDTO eventForm) {
 
@@ -90,7 +93,7 @@ public class EventController {
 		return ResponseEntity.ok().body(result);
 	}
 	
-	
+    @Scope("session")
 	@RequestMapping(value="/create", method = RequestMethod.POST, 
 			produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody ResponseEntity<EventResponseDTO> createEvent(@RequestBody EventDTO eventForm) {

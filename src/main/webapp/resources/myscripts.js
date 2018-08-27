@@ -1,5 +1,55 @@
 $(document).ready(function(){
 
+    function setupSession() {
+        $.ajax({
+            type: 'GET',
+            url: '/TimeTracker/register/session',
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                if (result.user) {
+                    console.log('Session setup: found session, user already logged in');
+                    $('#inputUserId').val(result.user.id);
+                    $("#loginButton").prop("disabled", true);
+                    $("#registerButton").prop("disabled", true);
+                    $("#changePasswordButton").prop("disabled", false);
+                    $("#logoutButton").prop("disabled", false);
+                    $('#loginModal').modal('hide');
+                    $("#calendar").show();
+                    var events = _.map(result.user.events, function(event) { 
+                        return _.extend({}, event, {allDay: false }); // lodash
+                    });
+                    console.log('Events', events);
+                    $('#calendar').fullCalendar('renderEvents', events, true);
+                } else {
+                    console.log('Session setup: no session, please login');
+                    $('#inputUserId').val(0);
+                    $("#loginButton").prop("disabled", false);
+                    $("#registerButton").prop("disabled", false);
+                    $("#changePasswordButton").prop("disabled", true);
+                    $("#logoutButton").prop("disabled", true);
+                    $('#calendar').fullCalendar('removeEvents');
+                    $("#calendar").hide();
+                }
+            },
+            error: function (x, e) {
+                console.log('Session setup: error', x, e);
+                if (x.status === 400 && x.responseJSON.msg === "notfound") {
+                    console.log('Session setup: no session, please login');
+                    $('#inputUserId').val(0);
+                    $("#loginButton").prop("disabled", false);
+                    $("#registerButton").prop("disabled", false);
+                    $("#changePasswordButton").prop("disabled", true);
+                    $("#logoutButton").prop("disabled", true);
+                    $('#calendar').fullCalendar('removeEvents');
+                    $("#calendar").hide();
+                } else {
+                	alertError("Kļūda: " + x.status);
+                }
+            }
+        });
+    }
+    
+    // Initial setup
     $("#loginButton").prop("disabled", false);
     $("#registerButton").prop("disabled", false);
     $("#changePasswordButton").prop("disabled", true);
@@ -8,7 +58,10 @@ $(document).ready(function(){
     $("#calendarModal").hide();
     $("#alertSuccess").hide();
     $("#alertError").hide();   
-    
+
+    // Afterwards setup session
+    setupSession();
+
     // LogoutButton
     $('#logoutButton').click(function () {
     	console.log('Logging out...');

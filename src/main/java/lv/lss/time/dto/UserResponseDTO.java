@@ -6,10 +6,12 @@ public class UserResponseDTO {
     
     public UserResponseDTO(UserDTO user) {
     	this.msg = "success";
-    	this.user = new UserDTO();
-    	this.user.setId(user.getId());
-    	this.user.setUsername(user.getUsername());
-    	this.user.setPassword("********");
+    	if (user != null) {
+        	this.user = new UserDTO();
+        	this.user.setId(user.getId());
+        	this.user.setUsername(user.getUsername());
+        	this.user.setPassword("********");
+    	}
     }
     
 }
