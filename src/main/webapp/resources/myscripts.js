@@ -390,6 +390,7 @@ $(document).ready(function(){
                 } else {
                 	var event = {};
                     event.id = result.event.id;
+                    event.userId = data.userId;
                     event.title = data.title;
                     event.start = data.start;
                     event.end = data.end;
