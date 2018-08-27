@@ -226,10 +226,14 @@ $(document).ready(function(){
     
     // Calendar
     $('#datetimepickerStart').datetimepicker({
-        format: 'DD-MM-YYYY HH:mm:ss'
+        format: 'DD-MM-YYYY HH:mm:ss',
+        timeZone: 'Europe/Riga',
+        sideBySide: true
     });
     $('#datetimepickerEnd').datetimepicker({
-        format: 'DD-MM-YYYY HH:mm:ss'
+        format: 'DD-MM-YYYY HH:mm:ss',
+        timeZone: 'Europe/Riga',
+        sideBySide: true
     });
     $('#calendar').fullCalendar({
     	header: {
@@ -301,11 +305,11 @@ $(document).ready(function(){
     	console.log(data.id === 0 ? 'Creating event...' : 'Updating event...', data.id);
     	data['userId'] = parseInt($('#inputUserId').val());
     	data['title'] = $('#inputActivity').val(); 
-    	data['start'] = $('#datetimepickerStart').data("DateTimePicker").date().toISOString().substring(0, 19);
+    	data['start'] = $('#datetimepickerStart').data("DateTimePicker").date().tz('Europe/Riga').toISOString().substring(0, 19);
     	if (data['start'] && data['start'].length === 10) {
     		data['start'] += 'T00:00:00';
     	}
-    	data['end'] = $('#datetimepickerEnd').data("DateTimePicker").date().toISOString().substring(0, 19);
+    	data['end'] = $('#datetimepickerEnd').data("DateTimePicker").date().tz('Europe/Riga').toISOString().substring(0, 19);
     	if (data['end'].length === 10) {
     		data['end'] += 'T00:00:00';
     	}
@@ -327,14 +331,14 @@ $(document).ready(function(){
                     event.title = data.title;
                     event.start = data.start;
                     event.end = data.end;
-                    $('#calendar').fullCalendar('updateEvent', event);
+                    $('#calendar').fullCalendar('updateEvent', event, true);
                 } else {
                 	var event = {};
                     event.id = result.event.id;
                     event.title = data.title;
                     event.start = data.start;
                     event.end = data.end;
-                    $('#calendar').fullCalendar('renderEvent', event);
+                    $('#calendar').fullCalendar('renderEvent', event, true);
                 }
                 $('#calendarModal').modal('hide');
             },
