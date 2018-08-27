@@ -135,6 +135,8 @@ $(document).ready(function(){
                 $('#loginModal').modal('hide');
                 if (x.status === 400 && x.responseJSON.msg === "empty") {
                     alertError("Lietotājs un parole jābūt aizpildītiem.");
+                } else if (x.status === 400 && x.responseJSON.msg === "notfound") {
+                    alertError("Lietotājs ar šādu paroli neeksistē.");
                 } else {
                 	alertError("Kļūda: " + x.status);
                 }

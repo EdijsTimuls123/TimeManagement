@@ -106,6 +106,7 @@ public class RegistrationController {
 		
 		UserResponseDTO result = new UserResponseDTO(userForm);
 		
+		// Check mandatory parameters
 		if (userForm == null || userForm.getUsername() == null || userForm.getPassword() == null ||
 				userForm.getUsername().isEmpty() || userForm.getPassword().isEmpty()) {
 			result.msg = "empty";
@@ -113,10 +114,15 @@ public class RegistrationController {
 		}
 				
 		User user = coreService.loginUser(userForm.getUsername(), userForm.getPassword());
-		if (user != null) {
-			logger.info(user.getId().toString());
-			result.user = convertToDto(user);
+
+		// Check if user is found
+		if (user == null) {
+			result.msg = "notfound";
+			return ResponseEntity.badRequest().body(result);
 		}
+
+		logger.info(user.getId().toString());
+		result.user = convertToDto(user);
 		
 		return ResponseEntity.ok().body(result);
 	}
