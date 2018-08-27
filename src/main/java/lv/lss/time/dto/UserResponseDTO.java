@@ -4,6 +4,10 @@ public class UserResponseDTO {
 	public String msg;
     public UserDTO user;
     
+    public UserResponseDTO() {
+    	this(null);
+    }
+
     public UserResponseDTO(UserDTO user) {
     	this.msg = "success";
     	if (user != null) {

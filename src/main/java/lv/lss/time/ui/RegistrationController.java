@@ -103,7 +103,7 @@ public class RegistrationController {
 		
 		logger.info("##### setup session");
 		
-		UserResponseDTO result = new UserResponseDTO(null);
+		UserResponseDTO result = new UserResponseDTO();
 
 		// Check existing session, retrieve user id
 		Integer userId = (Integer) session.getAttribute("id");
